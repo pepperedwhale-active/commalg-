@@ -7,9 +7,12 @@ from selenium.webdriver.common.keys import Keys
 import time
 import traceback
 
+
+
 class GraphApp:
-    def __init__(self, master, n,input_field):
+    def __init__(self, master, n,input_field,v):
         self.n = n
+        self.variablelist = ['a_' + str(i) for i in range(1,100)]
         try:
             self.input_field = input_field
             self.master = master
@@ -24,8 +27,9 @@ class GraphApp:
             self.vertices = {}
             self.edges = set()
             self.adj_list = {}
-            self.next_label = 'a'
+            self.next_label = self.variablelist[0]
             self.selected_vertex = None
+            self.varnumber = 0
 
             self.canvas.bind("<Button-1>", self.add_vertex)
             self.canvas.bind("<Shift-Button-1>", self.start_edge)
@@ -50,7 +54,8 @@ class GraphApp:
             self.canvas.create_oval(x - 5, y - 5, x + 5, y + 5, fill="blue")
             self.canvas.create_text(x, y, text=label, fill="white")
 
-            self.next_label = chr(ord(self.next_label) + 1)
+            self.next_label = self.variablelist[self.varnumber + 1]
+            self.varnumber += 1
             self.update_adj_list_display()
 
     def start_edge(self, event):
@@ -100,7 +105,8 @@ class GraphApp:
         self.vertices = {}
         self.edges = set()
         self.adj_list = {}
-        self.next_label = 'a'
+        self.next_label = self.variablelist[0]
+        self.varnumber = 0
         self.selected_vertex = None
 
         self.canvas.bind("<Button-1>", self.add_vertex)
@@ -110,16 +116,17 @@ class GraphApp:
 
 root = tk.Tk()
 n = input("n value:")
+v = input("number of vertices:")
 browser = webdriver.Firefox()
 browser.get("https://www.unimelb-macaulay2.cloud.edu.au/#home")
 time.sleep(15)
 input_field = browser.find_element(By.CSS_SELECTOR, "span.M2Input:nth-child(2)")
-input_field.send_keys("R = QQ[a..z]\n")
+input_field.send_keys(f"R = QQ[a_1..a_{v}]\n")
 input_field.send_keys(Keys.RETURN)
 time.sleep(3)
 
 
-app = GraphApp(root,int(n),input_field)
+app = GraphApp(root,int(n),input_field, v)
 # sub_btn=root.Button(root,text = 'Submit', command = GraphApp(root,int(n),input_field))
 # stp_btn = root.Button(root,text='clear',command=GraphApp(root,int(n),input_field))
 # T = tk.Entry(root)
